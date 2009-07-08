@@ -122,6 +122,39 @@ namespace Infiniminer
 
             return 1000;
         }
+        // This code gives blocks in sandbox mode correct pricing and denies lavaspam etc. - Cbock
+        public static uint GetCostSandbox(BlockType blockType)
+        {
+            switch (blockType)
+            {
+                case BlockType.BankRed:
+                case BlockType.BankBlue:
+                case BlockType.BeaconRed:
+                case BlockType.BeaconBlue:
+                    return 0;
+
+                case BlockType.SolidRed:
+                case BlockType.SolidBlue:
+                    return 0;
+
+                case BlockType.TransRed:
+                case BlockType.TransBlue:
+                    return 0;
+
+                case BlockType.Road:
+                    return 0;
+                case BlockType.Jump:
+                    return 0;
+                case BlockType.Ladder:
+                    return 0;
+                case BlockType.Shock:
+                    return 0;
+                case BlockType.Explosive:
+                    return 100;
+            }
+
+            return 1000;
+        }
 
         public static BlockTexture GetTexture(BlockType blockType, BlockFaceDirection faceDir)
         {
@@ -189,7 +222,7 @@ namespace Infiniminer
                 case BlockType.Road:
                     if (faceDir == BlockFaceDirection.YIncreasing)
                         return BlockTexture.RoadTop;
-                    else if (faceDir == BlockFaceDirection.YDecreasing||blockAbove!=BlockType.None) //Looks better but won't work with current graphics setup...
+                    else if (faceDir == BlockFaceDirection.YDecreasing || blockAbove != BlockType.None) //Looks better but won't work with current graphics setup...
                         return BlockTexture.RoadBottom;
                     return BlockTexture.Road;
 

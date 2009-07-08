@@ -65,3 +65,9 @@ Buglist:
 	-Death messages do not always display
 	-Players can use tools and block types outside of their class
 	-At various angles building blocks build them in thin air, unattached to any nearby block
+
+ModResist v.1:
+
+	-Server monitors for cooldown time abuse, autoflags abusers, and dissalows their updates for that cycle eliminating spam 		issues and mods.
+	-Server disalows placement of lava and other illegal blocks in any mode.
+	-Server kicks anyone who has clipped into the terrian, accidental or otherwise
