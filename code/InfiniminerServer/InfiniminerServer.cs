@@ -11,6 +11,10 @@ namespace Infiniminer
 {
     public class InfiniminerServer
     {
+        // Code added for Mod Resistance - DCaudill
+        public double highestAvgDistance = 0;
+
+
         InfiniminerNetServer netServer = null;
         public BlockType[, ,] blockList = null;    // In game coordinates, where Y points up.
         PlayerTeam[, ,] blockCreatorTeam = null;
@@ -1652,7 +1656,7 @@ namespace Infiniminer
                                                     case PlayerTools.Pickaxe:
                                                         //Modification to prevent client from ignoring axe cooldown times - Cbock
                                                         updateTime = DateTime.Now - player.AxeUsed;
-                                                        if (updateTime.TotalSeconds < 0.22f)
+                                                        if (updateTime.TotalSeconds < 0.1f)
                                                         {
                                                             player.Flagged = true;
                                                         }
@@ -1792,11 +1796,40 @@ namespace Infiniminer
                                                 player.Position = msgBuffer.ReadVector3();
                                                 player.Heading = msgBuffer.ReadVector3();
 
-                                                // This code prevents modders from using noclip, it kicks anyone inside a block - Cbock
-                                                if (BlockAtPoint(player.Position) != BlockType.None && BlockAtPoint(player.Position) != BlockType.TransBlue && BlockAtPoint(player.Position) != BlockType.TransRed && BlockAtPoint(player.Position) != BlockType.Lava)
+                                                // Code to pervent speed, no clipping, and flying mods - DCaudill
+
+                                                // Find out if the player is in the air
+                                                Vector3 footPosition = player.Position + new Vector3(0f, -1.5f, 0f);
+                                                BlockType standingOnBlock = BlockAtPoint(new Vector3(footPosition.X, footPosition.Y, footPosition.Z));
+                                                bool inAir = false;
+                                                if (standingOnBlock == BlockType.None && !CheckOnLadder(player))
+                                                    inAir = true;
+
+                                                // Update the players list of last 10 updates
+                                                playerList[msgSender].UpdatePositionServer(player.Position, inAir, player.Alive, DateTime.Now);
+
+                                                // Check for speed mods and kick if found
+                                                if (CheckSpeed(player) && player.positionList.Count > 9)
                                                 {
                                                     KickPlayer(player.IP);
-                                                    SendServerMessage("Kicked for Cliping, Sorry");
+                                                    SendServerMessage(player.Handle + " was kicked for speed mods, Sorry");
+                                                    ConsoleWrite(player.Handle + " was kicked for speed mods, Sorry");
+                                                }
+
+                                                // Check for flying mods and kick if found
+                                                if (CheckFlying(player) && player.positionList.Count > 9)
+                                                {
+                                                    KickPlayer(player.IP);
+                                                    SendServerMessage(player.Handle + " was kicked for flying, Sorry");
+                                                    ConsoleWrite(player.Handle + " was kicked for flying mods, Sorry");
+                                                }
+
+                                                // Check for no clipping mods and kick if found
+                                                if (CheckNoClipping(player) && player.positionList.Count > 9)
+                                                {
+                                                    KickPlayer(player.IP);
+                                                    SendServerMessage(player.Handle + " was kicked for no clipping, Sorry");
+                                                    ConsoleWrite(player.Handle + " was kicked for no clipping, Sorry");
                                                 }
 
                                                 player.Tool = (PlayerTools)msgBuffer.ReadByte();
@@ -2819,6 +2852,122 @@ namespace Infiniminer
 
                 updated = true;
             }
+        }
+
+        /***************
+        // Start of mods for detecting client mods
+        ***************/
+
+        // Checks the players speed over last 10 updates and trys to figure out if they are above expected speed - DCaudill
+        public bool CheckSpeed(Player player)
+        {
+            // Calculate expected max avg distance
+            double maxDistance = 0;
+            for (int i = 0; i < player.positionList.Count; i++)
+            {
+                Vector3 footPosition = player.positionList[i].position + new Vector3(0f, -1.5f, 0f);
+                BlockType standingOnBlock = BlockAtPoint(new Vector3(footPosition.X, footPosition.Y, footPosition.Z));
+
+                if (standingOnBlock == BlockType.Road)
+                    maxDistance += .5;
+                else
+                    maxDistance += .3;
+            }
+            maxDistance = maxDistance / player.positionList.Count;
+
+            // Calculate the players avg distance
+            double distance = 0;
+            bool oddDistance = false;
+            for (int i = 0; i < player.positionList.Count; i++)
+            {
+                if (player.positionList[i].distanceFromLast > .3 && !oddDistance)
+                {
+                    oddDistance = true;
+                    continue;
+                }
+
+                distance += player.positionList[i].distanceFromLast;
+            }
+
+            distance = distance / player.positionList.Count;
+
+            if (distance > maxDistance)
+                return true;
+            else
+                return false;
+        }
+
+        // Checks to see if the player has 4 consecutive no clipping flags - DCaudill
+        public bool CheckNoClipping(Player player)
+        {
+            int counter = 0;
+            for (int i = 0; i < player.positionList.Count; i++)
+            {
+                if (BlockAtPoint(player.positionList[i].position) != BlockType.None &&
+                BlockAtPoint(player.positionList[i].position) != BlockType.TransBlue &&
+                BlockAtPoint(player.positionList[i].position) != BlockType.TransRed &&
+                BlockAtPoint(player.positionList[i].position) != BlockType.Lava)
+                {
+                    counter++;
+                    if (counter > 4)
+                        return true;
+                }
+                else
+                    counter = 0;
+            }
+            return false;
+        }
+
+        // Checks to see if the player is flying by testing if its alive and stationary 
+        // in the air for 6 consecutive updates - DCaudill
+        public bool CheckFlying(Player player)
+        {
+            
+
+            int counter = 0;
+            for (int i = 0; i < player.positionList.Count; i++)
+            {
+                if (player.positionList[i].inAir && player.positionList[i].deltaY == 0 && player.positionList[i].alive)
+                {
+                    
+                    counter++;
+                    if (counter > 6)
+                        return true;
+                }
+                else
+                    counter = 0;
+            }
+            return false;
+        }
+
+        // Checks to see if the player is on a ladder - DCaudill
+        public bool CheckOnLadder(Player player)
+        {
+            Vector3[] directions = new Vector3[4] { new Vector3(1, 0, 0), 
+                        new Vector3(-1, 0, 0), 
+                        new Vector3(0, 0, 1), 
+                        new Vector3(0, 0, -1)};
+            Vector3 midBodyPoint;
+            Vector3 lowerBodyPoint;
+            Vector3 uperBodyPoint;
+
+
+            for (int j = 0; j < 4; j++)
+            {
+                lowerBodyPoint = player.Position + directions[j] + new Vector3(0, -1.4f, 0);
+                midBodyPoint = player.Position + directions[j] + new Vector3(0, -0.7f, 0);
+                uperBodyPoint = player.Position + directions[j];
+
+                BlockType lowerBlock = BlockAtPoint(lowerBodyPoint);
+                BlockType midBlock = BlockAtPoint(midBodyPoint);
+                BlockType upperBlock = BlockAtPoint(uperBodyPoint);
+
+                if (upperBlock == BlockType.Ladder || lowerBlock == BlockType.Ladder || midBlock == BlockType.Ladder)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

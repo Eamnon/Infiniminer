@@ -68,6 +68,15 @@ Buglist:
 
 ModResist v.1:
 
+	== CBock
 	-Server monitors for cooldown time abuse, autoflags abusers, and dissalows their updates for that cycle eliminating spam 		issues and mods.
 	-Server disalows placement of lava and other illegal blocks in any mode.
 	-Server kicks anyone who has clipped into the terrian, accidental or otherwise
+
+	== DCaudill
+	-Fixed possible false positives on no clipping.
+	-Server checks for speed mods, works on roads and with sprint(1.5).
+	-Server checks for obvious flying.
+	-Player class keeps the last some info from its last ten updates on the server only. Used for reducing false positives with mod detection.
+	-Added in player name to mod kick messages and added them to console output for server console window.
+

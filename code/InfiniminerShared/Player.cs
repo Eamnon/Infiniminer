@@ -269,5 +269,54 @@ namespace Infiniminer
             uniqueId += 1;
             return uniqueId;
         }
+
+        /***************
+        // Start of mods for detecting client mods
+        ***************/
+
+        // Added in to help with player tracking on the server - DCaudill
+        public struct PositionPacket
+        {
+            public Vector3 position;
+            public DateTime gameTime;
+            public double distanceFromLast;
+            public float deltaY;
+            public bool inAir;
+            public bool alive;
+
+            public PositionPacket(Vector3 position, bool inAir, bool alive, DateTime gameTime)
+            {
+                this.position = position;
+                this.inAir = inAir;
+                this.gameTime = gameTime;
+                this.distanceFromLast = 0;
+                this.deltaY = 0;
+                this.alive = alive;
+            }
+        }
+
+        public List<PositionPacket> positionList = new List<PositionPacket>();
+
+        public void UpdatePositionServer(Vector3 position, bool inAir, bool alive, DateTime gameTime)
+        {
+
+            PositionPacket positionPacket = new PositionPacket(position, inAir, alive, gameTime);
+
+
+            if (positionList.Count > 0)
+            {
+                positionPacket.distanceFromLast = Math.Sqrt(
+                       Math.Pow((positionPacket.position.X - positionList[positionList.Count - 1].position.X), 2) +
+                       Math.Pow((positionPacket.position.Z - positionList[positionList.Count - 1].position.Z), 2));
+
+                positionPacket.deltaY = positionPacket.position.Y - positionList[positionList.Count - 1].position.Y;
+            }
+
+            positionList.Add(positionPacket);
+
+            if (positionList.Count > 10)
+                positionList.RemoveAt(0);
+        }
+        // End mod
     }
 }
