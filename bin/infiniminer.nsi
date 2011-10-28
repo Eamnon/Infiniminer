@@ -15,7 +15,7 @@ UninstPage uninstConfirm
 UninstPage instfiles
 
 Section "Infiniminer (required)"
-	
+
 	SectionIn RO
 	SetOutPath $INSTDIR
 	File "Infiniminer.exe"
@@ -23,32 +23,32 @@ Section "Infiniminer (required)"
 	File "game.ico"
     File "*.txt"
     File "*.dll"
-	
+
 	SetOutPath $INSTDIR\Content
 	File "Content\*.xnb"
 	File "Content\*.wma"
-	
+
 	SetOutPath $INSTDIR\Content\blocks
 	File "Content\blocks\*.xnb"
-	
+
 	SetOutPath $INSTDIR\Content\menus
 	File "Content\menus\*.xnb"
-	
+
 	SetOutPath $INSTDIR\Content\sounds
 	File "Content\sounds\*.xnb"
-	
+
 	SetOutPath $INSTDIR\Content\sprites
 	File "Content\sprites\*.xnb"
-	
+
 	SetOutPath $INSTDIR\Content\icons
 	File "Content\icons\*.xnb"
-	
+
 	SetOutPath $INSTDIR\Content\ui
 	File "Content\ui\*.xnb"
-	
+
 	SetOutPath $INSTDIR\Content\tools
 	File "Content\tools\*.xnb"
-	
+
 	SetOutPath $INSTDIR
 
 	WriteRegStr HKLM "Software\Zachtronics Industries\Infiniminer" "Install_Dir" "$INSTDIR"
@@ -68,7 +68,7 @@ Section "Start Menu Shortcuts"
 	CreateShortCut "$SMPROGRAMS\Zachtronics Industries\Infiniminer\Infiniminer Client.lnk" "$INSTDIR\Infiniminer.exe" "" "$INSTDIR\game.ico" 0
 	CreateShortCut "$SMPROGRAMS\Zachtronics Industries\Infiniminer\Edit Client Configuration.lnk" "notepad.exe" "$INSTDIR\client.config.txt"
 	CreateShortCut "$SMPROGRAMS\Zachtronics Industries\Infiniminer\Infiniminer Server.lnk" "$INSTDIR\InfiniminerServer.exe" ""
-	CreateShortCut "$SMPROGRAMS\Zachtronics Industries\Infiniminer\Edit Server Configuration.lnk" "notepad.exe" "$INSTDIR\server.config.txt" 
+	CreateShortCut "$SMPROGRAMS\Zachtronics Industries\Infiniminer\Edit Server Configuration.lnk" "notepad.exe" "$INSTDIR\server.config.txt"
 	CreateShortCut "$SMPROGRAMS\Zachtronics Industries\Infiniminer\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
 	CreateShortCut "$SMPROGRAMS\Zachtronics Industries\Infiniminer\Infiniminer README.lnk" "notepad.exe" "$INSTDIR\README.txt"
 SectionEnd

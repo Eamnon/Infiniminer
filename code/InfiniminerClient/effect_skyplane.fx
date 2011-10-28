@@ -8,7 +8,7 @@
 
 struct VertexToPixel
 {
-    float4 Position   	: POSITION;    
+    float4 Position   	: POSITION;
     float4 Color		: COLOR0;
     float LightingFactor: TEXCOORD0;
     float2 TextureCoords: TEXCOORD1;
@@ -36,19 +36,19 @@ sampler TextureSampler = sampler_state { texture = <xTexture>; magfilter = LINEA
 //------- Technique: Pretransformed --------
 
 VertexToPixel PretransformedVS( float4 inPos : POSITION, float4 inColor: COLOR)
-{	
+{
 	VertexToPixel Output = (VertexToPixel)0;
-	
+
 	Output.Position = inPos;
 	Output.Color = inColor;
-    
-	return Output;    
+
+	return Output;
 }
 
-PixelToFrame PretransformedPS(VertexToPixel PSIn) 
+PixelToFrame PretransformedPS(VertexToPixel PSIn)
 {
-	PixelToFrame Output = (PixelToFrame)0;		
-	
+	PixelToFrame Output = (PixelToFrame)0;
+
 	Output.Color = PSIn.Color;
 
 	return Output;
@@ -57,7 +57,7 @@ PixelToFrame PretransformedPS(VertexToPixel PSIn)
 technique Pretransformed_2_0
 {
 	pass Pass0
-	{   
+	{
 		VertexShader = compile vs_2_0 PretransformedVS();
 		PixelShader  = compile ps_2_0 PretransformedPS();
 	}
@@ -66,7 +66,7 @@ technique Pretransformed_2_0
 technique Pretransformed
 {
 	pass Pass0
-	{   
+	{
 		VertexShader = compile vs_1_1 PretransformedVS();
 		PixelShader  = compile ps_1_1 PretransformedPS();
 	}
@@ -75,36 +75,36 @@ technique Pretransformed
 //------- Technique: Colored --------
 
 VertexToPixel ColoredVS( float4 inPos : POSITION, float4 inColor: COLOR, float3 inNormal: NORMAL)
-{	
+{
 	VertexToPixel Output = (VertexToPixel)0;
 	float4x4 preViewProjection = mul (xView, xProjection);
 	float4x4 preWorldViewProjection = mul (xWorld, preViewProjection);
-    
+
 	Output.Position = mul(inPos, preWorldViewProjection);
 	Output.Color = inColor;
-	
-	float3 Normal = normalize(mul(normalize(inNormal), xWorld));	
+
+	float3 Normal = normalize(mul(normalize(inNormal), xWorld));
 	Output.LightingFactor = 1;
 	if (xEnableLighting)
 		Output.LightingFactor = saturate(dot(Normal, -xLightDirection));
-    
-	return Output;    
+
+	return Output;
 }
 
-PixelToFrame ColoredPS(VertexToPixel PSIn) 
+PixelToFrame ColoredPS(VertexToPixel PSIn)
 {
-	PixelToFrame Output = (PixelToFrame)0;		
-    
+	PixelToFrame Output = (PixelToFrame)0;
+
 	Output.Color = PSIn.Color;
 	Output.Color.rgb *= saturate(PSIn.LightingFactor + xAmbient);
-	
+
 	return Output;
 }
 
 technique Colored_2_0
 {
 	pass Pass0
-	{   
+	{
 		VertexShader = compile vs_2_0 ColoredVS();
 		PixelShader  = compile ps_2_0 ColoredPS();
 	}
@@ -113,7 +113,7 @@ technique Colored_2_0
 technique Colored
 {
 	pass Pass0
-	{   
+	{
 		VertexShader = compile vs_1_1 ColoredVS();
 		PixelShader  = compile ps_1_1 ColoredPS();
 	}
@@ -123,26 +123,26 @@ technique Colored
 //------- Technique: Textured --------
 
 VertexToPixel TexturedVS( float4 inPos : POSITION, float3 inNormal: NORMAL, float2 inTexCoords: TEXCOORD0)
-{	
+{
 	VertexToPixel Output = (VertexToPixel)0;
 	float4x4 preViewProjection = mul (xView, xProjection);
 	float4x4 preWorldViewProjection = mul (xWorld, preViewProjection);
-    
-	Output.Position = mul(inPos, preWorldViewProjection);	
+
+	Output.Position = mul(inPos, preWorldViewProjection);
 	Output.TextureCoords = inTexCoords;
-	
-	float3 Normal = normalize(mul(normalize(inNormal), xWorld));	
+
+	float3 Normal = normalize(mul(normalize(inNormal), xWorld));
 	Output.LightingFactor = 1;
 	if (xEnableLighting)
 		Output.LightingFactor = saturate(dot(Normal, -xLightDirection));
-    
-	return Output;    
+
+	return Output;
 }
 
-PixelToFrame TexturedPS(VertexToPixel PSIn) 
+PixelToFrame TexturedPS(VertexToPixel PSIn)
 {
-	PixelToFrame Output = (PixelToFrame)0;		
-	
+	PixelToFrame Output = (PixelToFrame)0;
+
 	Output.Color = tex2D(TextureSampler, PSIn.TextureCoords);
 	Output.Color.rgb *= saturate(PSIn.LightingFactor + xAmbient);
 
@@ -152,7 +152,7 @@ PixelToFrame TexturedPS(VertexToPixel PSIn)
 technique Textured_2_0
 {
 	pass Pass0
-	{   
+	{
 		VertexShader = compile vs_2_0 TexturedVS();
 		PixelShader  = compile ps_2_0 TexturedPS();
 	}
@@ -161,7 +161,7 @@ technique Textured_2_0
 technique Textured
 {
 	pass Pass0
-	{   
+	{
 		VertexShader = compile vs_1_1 TexturedVS();
 		PixelShader  = compile ps_1_1 TexturedPS();
 	}
@@ -187,18 +187,18 @@ struct SpritesPixelIn
 SpritesVertexOut PointSpritesVS (float4 Position : POSITION, float4 Color : COLOR0, float1 Size : PSIZE)
 {
     SpritesVertexOut Output = (SpritesVertexOut)0;
-     
+
     float4x4 preViewProjection = mul (xView, xProjection);
-	float4x4 preWorldViewProjection = mul (xWorld, preViewProjection); 
-    Output.Position = mul(Position, preWorldViewProjection);    
+	float4x4 preWorldViewProjection = mul (xWorld, preViewProjection);
+    Output.Position = mul(Position, preWorldViewProjection);
     Output.Size = 1/(pow(Output.Position.z,2)+1	) * Size;
-    
-    return Output;    
+
+    return Output;
 }
 
 PixelToFrame PointSpritesPS(SpritesPixelIn PSIn)
-{ 
-    PixelToFrame Output = (PixelToFrame)0;    
+{
+    PixelToFrame Output = (PixelToFrame)0;
 
     #ifdef XBOX
 		float2 texCoord = abs(PSIn.TexCoord.zw);
@@ -207,14 +207,14 @@ PixelToFrame PointSpritesPS(SpritesPixelIn PSIn)
     #endif
 
     Output.Color = tex2D(TextureSampler, texCoord);
-    
+
     return Output;
 }
 
 technique PointSprites_2_0
 {
 	pass Pass0
-	{   
+	{
 		PointSpriteEnable = true;
 		VertexShader = compile vs_2_0 PointSpritesVS();
 		PixelShader  = compile ps_2_0 PointSpritesPS();
@@ -224,7 +224,7 @@ technique PointSprites_2_0
 technique PointSprites
 {
 	pass Pass0
-	{   
+	{
 		PointSpriteEnable = true;
 		VertexShader = compile vs_1_1 PointSpritesVS();
 		PixelShader  = compile ps_1_1 PointSpritesPS();
