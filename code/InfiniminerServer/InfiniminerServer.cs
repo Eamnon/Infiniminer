@@ -982,7 +982,7 @@ namespace Infiniminer
             ProcessCommand(consoleInput, (short)2, null);
             /*string[] args = consoleInput.Split(" ".ToCharArray(),2);
 
-            
+
             switch (args[0].ToLower().Trim())
             {
                 case "help":
@@ -2606,7 +2606,7 @@ namespace Infiniminer
         /*public void SendCurrentMapB(NetConnection client)
         {
             Debug.Assert(MAPSIZE == 64, "The BlockBulkTransfer message requires a map size of 64.");
-            
+
             for (byte x = 0; x < MAPSIZE; x++)
                 for (byte y=0; y<MAPSIZE; y+=16)
                 {
@@ -2918,18 +2918,18 @@ namespace Infiniminer
             return false;
         }
 
-        // Checks to see if the player is flying by testing if its alive and stationary 
+        // Checks to see if the player is flying by testing if its alive and stationary
         // in the air for 6 consecutive updates - DCaudill
         public bool CheckFlying(Player player)
         {
-            
+
 
             int counter = 0;
             for (int i = 0; i < player.positionList.Count; i++)
             {
                 if (player.positionList[i].inAir && player.positionList[i].deltaY == 0 && player.positionList[i].alive)
                 {
-                    
+
                     counter++;
                     if (counter > 6)
                         return true;
@@ -2943,9 +2943,9 @@ namespace Infiniminer
         // Checks to see if the player is on a ladder - DCaudill
         public bool CheckOnLadder(Player player)
         {
-            Vector3[] directions = new Vector3[4] { new Vector3(1, 0, 0), 
-                        new Vector3(-1, 0, 0), 
-                        new Vector3(0, 0, 1), 
+            Vector3[] directions = new Vector3[4] { new Vector3(1, 0, 0),
+                        new Vector3(-1, 0, 0),
+                        new Vector3(0, 0, 1),
                         new Vector3(0, 0, -1)};
             Vector3 midBodyPoint;
             Vector3 lowerBodyPoint;

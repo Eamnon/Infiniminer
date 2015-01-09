@@ -49,7 +49,7 @@ namespace Infiniminer.States
 
             uiFont = _SM.Content.Load<SpriteFont>("font_04b08");
             //keyMap = new KeyMap();
-            
+
             serverList = (_SM as InfiniminerGame).EnumerateServers(0.5f);
         }
 
@@ -146,7 +146,7 @@ namespace Infiniminer.States
                             // So, GetHostAddresses() might fail, but we don't really care. Just leave connectIp as null.
                         }
                     }
-                    if (connectIp != null)                   
+                    if (connectIp != null)
                     {
                         (_SM as InfiniminerGame).propertyBag.serverName = directConnectIP;
                         (_SM as InfiniminerGame).JoinGame(new IPEndPoint(connectIp, 5565));
